@@ -45,6 +45,7 @@ class Visite {
     private ?DateTime $datecreation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Range(min: 0, max: 20)]
     private ?int $note = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -54,6 +55,7 @@ class Visite {
     private ?int $tempmin = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\GreaterThan(propertyPath:"tempmin")]
     private ?int $tempmax = null;
 
     /**
@@ -145,7 +147,7 @@ class Visite {
         if ($this->datecreation == null) {
             return "";
         } else {
-            return $this->datecreation->format('d/m/y');
+            return $this->datecreation->format('d/m/Y');
         }
     }
 
