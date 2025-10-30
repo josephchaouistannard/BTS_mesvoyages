@@ -22,10 +22,10 @@ class Visite {
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-    
+
     #[Vich\UploadableField(mapping: 'visites', fileNameProperty: 'imageName', size: 'imageSize')]
     private ?File $imageFile = null;
-    
+
     #[ORM\Column(nullable: true)]
     private ?string $imageName = null;
 
@@ -42,6 +42,11 @@ class Visite {
     private ?string $pays = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Range(
+                min: '1900-01-01',
+                max: 'now',
+                notInRangeMessage: 'The creation date must be between {{ min }} and {{ max }}.'
+        )]
     private ?DateTime $datecreation = null;
 
     #[ORM\Column(nullable: true)]
@@ -55,7 +60,7 @@ class Visite {
     private ?int $tempmin = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\GreaterThan(propertyPath:"tempmin")]
+    #[Assert\GreaterThan(propertyPath: "tempmin")]
     private ?int $tempmax = null;
 
     /**
@@ -64,8 +69,7 @@ class Visite {
     #[ORM\ManyToMany(targetEntity: Environnement::class)]
     private Collection $environnements;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->environnements = new ArrayCollection();
     }
 
@@ -154,13 +158,11 @@ class Visite {
     /**
      * @return Collection<int, Environnement>
      */
-    public function getEnvironnements(): Collection
-    {
+    public function getEnvironnements(): Collection {
         return $this->environnements;
     }
 
-    public function addEnvironnement(Environnement $environnement): static
-    {
+    public function addEnvironnement(Environnement $environnement): static {
         if (!$this->environnements->contains($environnement)) {
             $this->environnements->add($environnement);
         }
@@ -168,13 +170,12 @@ class Visite {
         return $this;
     }
 
-    public function removeEnvironnement(Environnement $environnement): static
-    {
+    public function removeEnvironnement(Environnement $environnement): static {
         $this->environnements->removeElement($environnement);
 
         return $this;
     }
-    
+
     public function getImageFile(): ?File {
         return $this->imageFile;
     }
@@ -189,7 +190,7 @@ class Visite {
 
     public function setImageFile(?File $imageFile): void {
         $this->imageFile = $imageFile;
-        
+
         if (null !== $imageFile) {
             $this->updatedAt = new DateTimeImmutable();
         }
@@ -202,24 +203,23 @@ class Visite {
     public function setImageSize(?int $imageSize): void {
         $this->imageSize = $imageSize;
     }
-    
+
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context) {
         $file = $this->getImageFile();
         if ($file != null && $file != "") {
-           $poids = @filesize($file);
-           if ($poids != false && $poids > 512000) {
-               $context->buildViolation("Cette image est trop lourde (500Ko max) ")
-                       ->atPath('imageFile')
-                       ->addViolation();
-           }
-           $infosImage = @getImageSize($file);
-           if ($infosImage == false) {
-               $context->buildViolation("Ce fichier n'est pas une image")
-                       ->atPath('imageFile')
-                       ->addViolation();
-           }
+            $poids = @filesize($file);
+            if ($poids != false && $poids > 512000) {
+                $context->buildViolation("Cette image est trop lourde (500Ko max) ")
+                        ->atPath('imageFile')
+                        ->addViolation();
+            }
+            $infosImage = @getImageSize($file);
+            if ($infosImage == false) {
+                $context->buildViolation("Ce fichier n'est pas une image")
+                        ->atPath('imageFile')
+                        ->addViolation();
+            }
         }
     }
-
 }
