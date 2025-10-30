@@ -13,4 +13,4 @@ jobs:
         server: node151-eu.n0c.com
         server-dir: /public_html/mesvoyages/
         username: ftp@mesvoyages.go.yn.fr
-        password: ${{ secrets.ftp_password }
+        password: ${{ secrets.ftp_password }}
